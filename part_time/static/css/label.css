@@ -1,0 +1,24 @@
+.index-label {
+    float: left;
+    height: 22px;
+    margin-top: 2px;
+    margin-right: 8px;
+    padding: 0 10px;
+    line-height: 22px;
+    background-color: #fff;
+    color: #70797b;
+    font-size: 12px;
+    border-radius: 10px;
+    border: 1px solid #ededed;
+}
+
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+}
+.sign_up_btn > li a {
+    color: #fff9f9
+}

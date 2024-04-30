@@ -1,0 +1,88 @@
+{% extends "header.html" %}
+
+
+{% block title %}Find A Job{% endblock %}
+
+{% block content %}
+<section class="our-faq bgc-fa">
+    <div class="container">
+        <div class="row">
+            <div style="width: 100%">
+                <!-- search -->
+                <form action="{{ url_for('job.index', kw=kw) }}">
+                    <div class="faq_search_widget mb30">
+                        <h4 class="fz20 mb15">Search Keywords</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="kw" name="kw" placeholder="e.g. Java" aria-label="Recipient's username" aria-describedby="button-addon2" value="{{ request.args.get('kw', '') }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit" id="button-addon2"><span class="flaticon-search"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    {% if pagination.total == 0 %}
+                        <div align="center"  style="width: 100%">
+                            <img src="{{ url_for('static', filename='images/no_job.png') }}" width="200">
+                          <h3>The result of the query does not exist!</h3>
+                        </div>
+                    {% else %}
+                    {% for job in pagination.items %}
+                        <div class="col-sm-12 col-lg-12" style="height: 200px;margin-bottom: 20px">
+                            <div class="fj_post" style="height: 200px">
+                                <div class="details">
+                                    <div class="thumb fn-smd">
+                                        <img width="135" height="135" class="img-fluid" src="{{ job.company.logo }}" alt="Not yet uploaded！">
+                                    </div>
+                                    <b>{{ job.name}}</b>&nbsp;&nbsp;
+                                    <div style="display: block">
+                                        {% if job.tag_list %}
+                                            {% for tag in job.tag_list[:2] %}
+                                                {% if tag != '' %}
+                                                    <span class="index-label"><small>{{ tag }}</small></span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div style="margin-top: 40px">Posted by <a class="text-thm" href="{{ url_for('company.detail', company_id=job.company.id) }}">{{ job.company.name }}</a></div>
+                                    <ul class="featurej_post" style="margin-top: 20px">
+                                        <li class="list-inline-item"><span class="flaticon-location-pin"></span>{{ job.city }}</li>
+                                        <li class="list-inline-item"><span class="flaticon-price pl20" style="padding: 0;color: #fd5f39;" ></span><span style="font-size: 18px; float: right; margin-right: 12px; color: #fd5f39;">{{ job.salary_min }}k-{{ job.salary_max }}k</span></li>
+                                    </ul>
+                                </div>
+                                <a class="btn btn-md btn-transparent float-right fn-smd" href="{{ url_for('job.detail', job_id=job.id) }}">Browse Job</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="col-lg-12">
+                        <div class="mbp_pagination">
+                            <ul class="page_navigation">
+                                 {% if pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('job.index', page=pagination.prev_num, kw=kw)}}" tabindex="-1" aria-disabled="true"> <span class="flaticon-left-arrow"></span> Previous</a>
+                                    </li>
+                                 {% endif %}
+                                 {% for page in pagination.iter_pages() %}
+                                    {% if page %}
+                                        {% if page != pagination.page %}
+                                            <li class="page-item"><a class="page-link"  href="{{ url_for('job.index', page=page, kw=kw) }}">{{ page }}</a></li>
+                                        {% else %}
+                                            <li class="page-item active"><a class="page-link">{{page}} <span class="sr-only">(current)</span></a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                 {% endfor %}
+                                {% if pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('job.index', page=pagination.next_num)}}">Next <span class="flaticon-right-arrow"></span></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

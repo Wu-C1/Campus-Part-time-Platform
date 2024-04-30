@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_job, render_pagination %}
+
+{% block title %}Recommendations{% endblock %}
+
+{% block body %}
+{% if jobs.total == 0 %}
+    <div align="center" >
+      <img src="{{ url_for('static', filename='images/no_job.png') }}" width="200">
+      <h3>查无职位</h3>
+    </div>
+{% endif %}
+<div class="job_list">
+    {% for job in jobs %}
+        {{ render_job(job) }}
+    {% endfor %}
+</div>
+{% endblock %}

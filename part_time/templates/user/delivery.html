@@ -1,0 +1,80 @@
+{% extends "user/base.html" %}
+
+{% block title %}
+    Job Search Record
+{% endblock %}
+
+{% block right %}
+
+<div class="col-sm-12 col-lg-8 col-xl-9">
+    <div class="row">
+        <div class="col-lg-12">
+            <ul class="nav nav-tabs">
+                <li style="margin: 0 10px" role="presentation" class="{% if not status %}active{% endif %}"><a href="{{ url_for('user.delivery') }}">All</a></li>
+                <li style="margin: 0 10px" role="presentation" class="{% if status == '1' %}active{% endif %}"><a href="{{ url_for('user.delivery', status=1) }}">Unanswered</a></li>
+                <li style="margin: 0 10px" role="presentation" class="{% if status == '3' %}active{% endif %}"><a href="{{ url_for('user.delivery', status=3) }}">Interested</a></li>
+                <li style="margin: 0 10px" role="presentation" class="{% if status == '2' %}active{% endif %}"><a href="{{ url_for('user.delivery', status=2) }}">Unfit</a></li>
+            </ul>
+        </div>
+        <div class="col-lg-12">
+            <div class="candidate_job_reivew style2">
+                <div class="table-responsive job_review_table mt0">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Office</th>
+                                <th scope="col">Firm</th>
+                                <th scope="col">Delivery Time</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {%for delivery in pagination.items %}
+                            <tr>
+                                <td><a href="{{ url_for('job.detail', job_id=delivery.job.id) }}">{{ delivery.job.name }}</a></td>
+                                <td><a href="{{ url_for('company.detail', company_id=delivery.company_id) }}">{{ delivery.company.name }}</a></td>
+                                <td>{{ delivery.created_at }}</td>
+                                <td>
+                                    {% if delivery.status == 1 %}
+                                        <span class="label label-info">Unanswered</span>
+                                    {% elif delivery.status == 2 %}
+                                        <span class="label label-default">Unfit</span>
+                                    {% elif delivery.status == 3 %}
+                                        <span class="label label-success">Interested</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="col-lg-12">
+                        <div class="mbp_pagination">
+                            <ul class="page_navigation">
+                                 {% if pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('user.delivery', page=pagination.prev_num, kw=kw)}}" tabindex="-1" aria-disabled="true"> <span class="flaticon-left-arrow"></span> Previous</a>
+                                    </li>
+                                 {% endif %}
+                                 {% for page in pagination.iter_pages() %}
+                                    {% if page %}
+                                        {% if page != pagination.page %}
+                                            <li class="page-item"><a class="page-link"  href="{{ url_for('user.delivery', page=page, kw=kw) }}">{{ page }}</a></li>
+                                        {% else %}
+                                            <li class="page-item active"><a class="page-link">{{page}} <span class="sr-only">(current)</span></a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                 {% endfor %}
+                                {% if pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('user.delivery', page=pagination.next_num)}}">Next <span class="flaticon-right-arrow"></span></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

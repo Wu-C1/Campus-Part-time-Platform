@@ -1,0 +1,14 @@
+{% if current_user.is_admin() %}
+    {% extends "admin/base.html" %}
+{% elif current_user.is_company() %}
+    {% extends "company/base.html" %}
+{% endif %}
+{% from "macros.html" import render_form %}
+
+{% block title %}
+Publishing Jobs
+{% endblock %}
+
+{% block right %}
+    {{ render_form('Publishing Jobs', form, url_for('job.create')) }}
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "company/base.html" %}
+{% from "macros.html" import render_pagination %}
+
+{% block title %}
+Job Management
+{% endblock %}
+
+{% block right %}
+<div class="col-sm-12 col-lg-8 col-xl-9">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="candidate_job_reivew style2">
+                <div class="table-responsive job_review_table mt0">
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Office</th>
+                                <th scope="col">Release Time</th>
+                                <th scope="col">Update Time</th>
+                                <th scope="col">Operator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {%for job in pagination.items %}
+                          <tr>
+                            <td><a href="{{ url_for('job.detail', job_id=job.id) }}">{{ job.name }}</a></td>
+                            <td>{{ job.created_at }}</td>
+                            <td>{{ job.updated_at }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                  {% if job.is_enable %}
+                                  <a href="{{ url_for('job.disable', job_id=job.id) }}" type="button" class="btn btn-default">Down</a>
+                                  {% else %}
+                                  <a href="{{ url_for('job.enable', job_id=job.id) }}" type="button" class="btn btn-default">Up</a>
+                                  {% endif %}
+                                  <a href="{{ url_for('job.edit', job_id=job.id) }}" type="button" class="btn btn-default">
+                                      Edit
+                                  </a>
+                                  <button type="button" class="btn btn-default dropdown-toggle"
+                                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                      Delete
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    <li><a href="{{ url_for('job.delete', job_id=job.id) }}">Sure</a></li>
+                                  </ul>
+                                </div>
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                    </table>
+                <div class="col-lg-12">
+                        <div class="mbp_pagination">
+                            <ul class="page_navigation">
+                                 {% if pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('company.jobs', page=pagination.prev_num, kw=kw)}}" tabindex="-1" aria-disabled="true"> <span class="flaticon-left-arrow"></span> Previous</a>
+                                    </li>
+                                 {% endif %}
+                                 {% for page in pagination.iter_pages() %}
+                                    {% if page %}
+                                        {% if page != pagination.page %}
+                                            <li class="page-item"><a class="page-link"  href="{{ url_for('company.jobs', page=page, kw=kw) }}">{{ page }}</a></li>
+                                        {% else %}
+                                            <li class="page-item active"><a class="page-link">{{page}} <span class="sr-only">(current)</span></a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                 {% endfor %}
+                                {% if pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('company.jobs', page=pagination.next_num)}}">Next <span class="flaticon-right-arrow"></span></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

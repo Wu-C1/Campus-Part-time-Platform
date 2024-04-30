@@ -1,0 +1,8 @@
+{% extends "header.html" %}
+{% from "macros.html" import render_form %}
+
+{% block title %}Individual Registration{% endblock %}
+
+{% block content %}
+    {{ render_form('Individual Registration', form, url_for("user.register"), col_md=False) }}
+{% endblock %}

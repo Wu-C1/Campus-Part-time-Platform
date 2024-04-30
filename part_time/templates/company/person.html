@@ -1,0 +1,10 @@
+{% extends "company/base.html" %}
+{% from "macros.html" import render_form %}
+
+{% block title %}
+Account Management
+{% endblock %}
+
+{% block right %}
+{{ render_form('Account Management', form, url_for('company.person')) }}
+{% endblock %}

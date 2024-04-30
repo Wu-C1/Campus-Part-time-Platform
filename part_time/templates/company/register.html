@@ -1,0 +1,8 @@
+{% extends "header.html" %}
+{% from "macros.html" import render_form %}
+
+{% block title %}Firm Registration{% endblock %}
+
+{% block content %}
+    {{ render_form('Firm Registration', form, url_for("company.register"), col_md=False) }}
+{% endblock %}

@@ -1,0 +1,270 @@
+{% extends "header.html" %}
+
+{% block title %}
+{{ job.name }}
+{% endblock %}
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+<script>
+$(document).ready(function() {
+  $('#rateButton').click(function(event) {
+    event.preventDefault();
+    $('#rateModal').modal('show');
+  });
+
+
+  $('#rateForm').submit(function(event) {
+    event.preventDefault();
+    var rateValue = $('#rateInput').val();
+    if(!Number.isInteger(Number(rateValue)) || Number(rateValue) < 0 || Number(rateValue) > 5){
+        alert('score必须为1-5的整数');
+        return;
+    }
+
+
+  $.ajax({
+    type: "POST",
+    url: "/job/rate",
+      contentType: 'application/json',
+    data: JSON.stringify({
+        rate: rateValue,
+        job_id: '{{ job.id|safe }}',
+        company_id: '{{ job.company.id|safe }}'
+    }),
+    success: function(data) {
+      // score提交成功后的处理
+      {#alert("score提交成功！");#}
+      // 假设这个函数是在某个事件触发后被调用的
+      document.querySelector('#rateValue').textContent = '我的score：'+ rateValue;
+
+      $('#rateModal').modal('hide');
+    },
+    error: function(xhr, status, error) {
+      alert("提交失败，请重试。");
+    }
+  });
+    $('#rateModal').modal('hide');
+  });
+});
+</script>
+
+{% block content %}
+{#    上面#}
+<section class="bgc-fa pt80 mbt45">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-xl-9">
+                <div class="candidate_personal_info style2">
+                    <div class="thumb text-center">
+                        <img  width="135" height="135"  class="img-fluid rounded" src="{{ job.company.logo }}" alt="{{ job.company.name }}"><br><br>
+                        <a class="mt25" href="{{ url_for('company.detail', company_id=job.company.id) }}">View all jobs <span class="flaticon-right-arrow pl10"></span></a>
+                    </div>
+                    <div class="details">
+                        <h3>{{ job.name }}</h3>
+                        <div style="display: block">
+                            {% if job.tag_list %}
+                                {% for tag in job.tag_list[:2] %}
+                                    {% if tag != '' %}
+                                        <span class="index-label"><small>{{ tag }}</small></span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div style="margin-top: 40px">Posted {{ moment(job.updated_at, local=true).fromNow(refresh=True) }} by <a class="text-thm" href="{{ url_for('company.detail', company_id=job.company.id) }}">{{ job.company.name }}</a></div>
+                        <ul class="featurej_post" style="margin-top: 20px">
+                            <li class="list-inline-item"><span class="flaticon-location-pin"></span>{{ job.city }}</li>
+                            <li class="list-inline-item"><span class="flaticon-price pl20" style="padding: 0;color: #fd5f39;" ></span><span style="font-size: 18px; float: right; margin-right: 12px; color: #fd5f39;">{{ job.salary_min }}k-{{ job.salary_max }}k</span></li>
+                            &nbsp;&nbsp;{{ job.exp }} experiences / {{ job.education }}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-xl-3">
+                <div class="candidate_personal_overview style2">
+                    {% if job.is_enable %}
+                      {% if current_user.role == 10 %}
+                          {% if current_user.is_authenticated and job.is_applied() %}
+                            <a class="btn btn-success btn-lg dilivery-btn disabled navbar-btn" style="margin-top: 32px">已投递</a>
+                          {% else %}
+                              <a href="{{ url_for('job.apply', job_id=job.id) }}"><button class="btn btn-block btn-thm mb15">Apply Now <span class="flaticon-right-arrow pl10"></span></button></a>
+                          {% endif %}
+                      {% endif %}
+                    {% else %}
+                      <a class="btn btn-default btn-lg dilivery-btn disabled navbar-btn" style="margin-top: 32px">职位已下线</a>
+                    {% endif %}
+
+                    <!-- <button class="btn btn-block btn-gray"><span class="flaticon-favorites pr10"></span> Shortlist</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{#   下面 #}
+<section class="bgc-white pb30">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-xl-8">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="candidate_about_info style2">
+                            <h4 class="fz20 mb30">Job Description</h4>
+                            <p class="fwb">Job Requirements:</p>
+                            <p>{{ job.description  | safe }}</p>
+                            <p class="fwb">Welfare Treatment:</p>
+                            <p>{{ job.treament  | safe }}</p>
+                            <p class="mb60"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-xl-4">
+             <!-- 评分 -->
+                <div>
+                    <h4 class="title" style="font-size: 20px;">Leave Your Review</h4>
+                    <div class="candidate_leave_review text-center">
+                        <div class="detials">
+                            <form id="review-form" class="ulockd-mrgn630" action="/job/rate" method="post">
+                                  <h4>What do you think of this company?</h4>
+                                <div class="star-rating">
+                                    <input type="radio" name="ratings[1]" id="Overall_5" value="5" class="radio">
+                                    <label for="Overall_5"></label>
+                                    <input type="radio" name="ratings[1]" id="Overall_4" value="4" class="radio">
+                                    <label for="Overall_4"></label>
+                                    <input type="radio" name="ratings[1]" id="Overall_3" value="3" class="radio">
+                                    <label for="Overall_3"></label>
+                                    <input type="radio" name="ratings[1]" id="Overall_2" value="2" class="radio">
+                                    <label for="Overall_2"></label>
+                                    <input type="radio" name="ratings[1]" id="Overall_1" value="1" class="radio">
+                                    <label for="Overall_1"></label>
+                                  </div>
+                                <input type="hidden" name="job_id" value="{{ job.id }}">
+                                <input type="hidden" name="company_id" value="{{ job.company.id }}">
+                                <div class="form-group text-center">
+                                    <button type="submit"  class="btn btn-lg btn-thm" style="padding: 15px 20px;width: 260px;">Submit Review <span class="flaticon-right-arrow"></span></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="fz20 mb30">Company Information</h4>
+                <div class="candidate_working_widget style2 bgc-fa">
+                    <div class="icon text-thm"><span class="flaticon-mortarboard"></span></div>
+                    <div class="col-md-3">
+                    <div class="details" style="width: 260px;">
+                        <p class="color-black22">Company Name</p>
+                        <p>{{ job.company.name }}</p>
+                    </div>
+                    <div class="icon text-thm"><span class="flaticon-line-chart"></span></div>
+                    <div class="details"  style="width: 260px;">
+                        <p class="color-black22">finance</p>
+                        <p>{{ job.company.finance_stage }}</p>
+                    </div>
+                    <div class="icon text-thm"><span class="flaticon-controls"></span></div>
+                    <div class="details" style="width: 260px">
+                        <p class="color-black22">Website</p>
+                        <p>
+                            {% if job.company.website %}
+                            <a href="{{ job.company.website }}">
+                                {{ job.company.website }}
+                            </a>
+                            {% endif%}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{#<div class="jumbotron">#}
+{#  <div class="container">#}
+{#    <div class="col-md-8">#}
+{#      <h2 style="padding-bottom: 16px">{{ job.name }}</h2>#}
+{#      <p>#}
+{#          <span class="job-salary" style="font-size: 18px">{{ job.salary_min }}k-{{ job.salary_max }}k#}
+{#          </span>&nbsp;&nbsp;{{ job.exp }}经验 / {{ job.education }}#}
+{#          <!--{{ share.create(title='分享：', sites='weibo', mobile_sites='weibo') }}-->#}
+{#      </p>#}
+{#          <span class="timesince">{{ moment(job.updated_at, local=true).fromNow(refresh=True) }}publish</span>#}
+{#    </div>#}
+{#    <div class="col-md-4">#}
+{#    {% if job.is_enable %}#}
+{#      {% if current_user.role == 10 %}#}
+{#          {% if current_user.is_authenticated and job.is_applied() %}#}
+{#            <a class="btn btn-success btn-lg dilivery-btn disabled navbar-btn" style="margin-top: 32px">已投递</a>#}
+{#              <div>#}
+{#                    <span id = "rateValue" style="font-size: 16px;color: #333">我的score：{{ rate }}</span>#}
+{#                    <a href="#" id="rateButton" class="btn btn-success btn-lg navbar-btn" style="margin-left: 10px">score</a>#}
+{#                </div>#}
+{#          {% else %}#}
+{#            <a href="{{ url_for('job.apply', job_id=job.id) }}" class="btn btn-success btn-lg navbar-btn" style="margin-top: 32px">投递简历</a>#}
+{#          {% endif %}#}
+{#      {% endif %}#}
+{#    {% else %}#}
+{#      <a class="btn btn-default btn-lg dilivery-btn disabled navbar-btn" style="margin-top: 32px">职位已下线</a>#}
+{#    {% endif %}#}
+{#    </div>#}
+{#  </div>#}
+{#</div>#}
+{#    <!-- score模态对话框 -->#}
+{#<div id="rateModal" class="modal fade" tabindex="-1" role="dialog">#}
+{#  <div class="modal-dialog" role="document">#}
+{#    <div class="modal-content">#}
+{#      <div class="modal-header">#}
+{#        <h5 class="modal-title">score</h5>#}
+{#        <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+{#          <span aria-hidden="true">&times;</span>#}
+{#        </button>#}
+{#      </div>#}
+{#      <div class="modal-body">#}
+{#        <form id="rateForm">#}
+{#          <div class="form-group">#}
+{#            <label for="rateInput">score</label>#}
+{#            <input type="number" class="form-control" id="rateInput" placeholder="请输入你的score">#}
+{#          </div>#}
+{#          <button type="submit" class="btn btn-primary">提交score</button>#}
+{#        </form>#}
+{#      </div>#}
+{#    </div>#}
+{#  </div>#}
+{#</div>#}
+
+{##}
+{#{% block body %}#}
+{#<div class="col-md-8">#}
+{#  <div class="job-detail">#}
+{#    <h4>Job Benefits</h4><br>#}
+{#    <p>{{ job.treatment | safe }}</p>#}
+{#    <br>#}
+{#    <h4>Job Description</h4><br>#}
+{#    <p>{{ job.description | safe }}</p>#}
+{#    <h4>Work Address</h4><br>#}
+{#    <p>{{ job.company.address }}</p>#}
+{#  </div>#}
+{#</div>#}
+{#<div class="col-md-3">#}
+{#  <div class="thumbnail">#}
+{#    <a href="{{ url_for('company.detail', company_id=job.company.id) }}">#}
+{#      <img src="{{ job.company.logo }}" class="img-rounded big-logo-img" >#}
+{#    </a>#}
+{#  </div>#}
+{##}
+{#  <h4>{{ job.company.name }}</h4>#}
+{#  <p>Domains：{{ job.company.field }}</p>#}
+{#  <p>finance：{{ job.company.finance_stage }}</p>#}
+{#  <p>City：{{ job.city }}</p>#}
+{#  <p>Website：#}
+{#    {% if job.company.website %}#}
+{#    <a href="{{ job.company.website }}">#}
+{#        {{ job.company.website }}#}
+{#    </a>#}
+{#    {% else %}#}
+{#        暂无#}
+{#    {% endif %}#}
+{#  </p>#}
+{#  <p>score：{{ job.company.rate }}</p>#}
+{#</div>#}
+{#{% endblock %}#}
+

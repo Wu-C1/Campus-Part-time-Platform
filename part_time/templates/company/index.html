@@ -1,0 +1,91 @@
+{% extends "header.html" %}
+
+{% block title %}Employer{% endblock %}
+
+
+{% block content %}
+<section class="our-faq bgc-fa">
+    <div class="container">
+        <div class="row" >
+            <div  style="width: 100%">
+                <!-- search -->
+                <form action="{{ url_for('company.index', kw=kw) }}">
+                    <div class="faq_search_widget mb30">
+                        <h4 class="fz20 mb15">Search Keywords</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="kw" name="kw" placeholder="e.g. baidu" aria-label="Recipient's username" aria-describedby="button-addon2" value="{{ request.args.get('kw', '') }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="submit" id="button-addon2"><span class="flaticon-search"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    {% if pagination.total == 0 %}
+                        <div align="center"  style="width: 100%">
+                            <img src="{{ url_for('static', filename='images/no_company.png') }}" width="200">
+                          <h3>The result of the query does not exist!</h3>
+                        </div>
+                    {% else %}
+                    {% for company in pagination.items %}
+                        <div class="col-lg-12">
+							<div class="fj_post style2 lpd45"  style="height: 200px;margin-bottom: 20px">
+								<div class="details">
+									<div class="thumb fn-smd">
+										<img width="135" height="135"  class="img-fluid" src="{{ company.logo }}" alt="{{ company.name }}">
+									</div>
+									<h4> <a href="{{ url_for('company.detail', company_id=company.id) }}">{{ company.name }}</a></h4>
+									<p class="text-thm2">{{ company.field }} / {{ company.finance_stage }}</p>
+                                    <div class="text-thm2" style="width: 90%;">{{ company.description }}</div>
+								</div>
+								<div class="job_post_count text-center">
+									<h3 class="text-thm2">{{ company.enabled_jobs().count() }}</h3>
+									<p>Open Jobs</p>
+								</div>
+							</div>
+						</div>
+                    {% endfor %}
+                    <div class="col-lg-12">
+                        <div class="mbp_pagination">
+                            <ul class="page_navigation">
+                                 {% if pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('company.index', page=pagination.prev_num, kw=kw)}}" tabindex="-1" aria-disabled="true"> <span class="flaticon-left-arrow"></span> Previous</a>
+                                    </li>
+                                 {% endif %}
+                                 {% for page in pagination.iter_pages() %}
+                                    {% if page %}
+                                        {% if page != pagination.page %}
+                                            <li class="page-item"><a class="page-link"  href="{{ url_for('company.index', page=page, kw=kw) }}">{{ page }}</a></li>
+                                        {% else %}
+                                            <li class="page-item active"><a class="page-link">{{page}} <span class="sr-only">(current)</span></a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                 {% endfor %}
+                                {% if pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{url_for('company.index', page=pagination.next_num)}}">Next <span class="flaticon-right-arrow"></span></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    <script src="../../static/js/jquery-3.3.1.js"></script>
+    <script>
+    $(document).ready(function(){
+      $('.text-thm2').each(function() {
+        var maxLength = 106;
+        var text = $(this).text();
+        if(text.length > maxLength) {
+          $(this).text(text.substr(0, maxLength) + '...');
+        }
+      });
+    });
+    </script>
+{% endblock %}
